@@ -4,7 +4,7 @@ import type { Conversation } from "../types/conversation";
 
 const collection = () => getDB().collection("conversations");
 
-export const create = async (data: {
+export const insertConversation = async (data: {
   title: string;
 }): Promise<Conversation> => {
   const doc = {
@@ -16,7 +16,7 @@ export const create = async (data: {
   return { _id: result.insertedId, ...doc };
 };
 
-export const findAll = async (
+export const findConversations = async (
   offset: number,
   limit: number,
 ): Promise<Conversation[]> => {
@@ -46,6 +46,6 @@ export const updateTitle = async (
   return result as Conversation | null;
 };
 
-export const count = async (): Promise<number> => {
+export const countConversations = async (): Promise<number> => {
   return collection().countDocuments();
 };

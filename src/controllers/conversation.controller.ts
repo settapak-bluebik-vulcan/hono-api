@@ -9,7 +9,7 @@ import {
 import { BadRequestError, NotFoundError } from "../errors/app-error";
 import * as conversationService from "../services/conversation.service";
 
-export const create = async (c: Context) => {
+export const createConversation = async (c: Context) => {
   const body = await c.req.json<CreateConversationDto>();
 
   if (!body.title) {
@@ -20,10 +20,10 @@ export const create = async (c: Context) => {
   return c.json({ success: true, data: conversation }, 201);
 };
 
-export const getAll = async (c: Context) => {
+export const listConversations = async (c: Context) => {
   const offset = Number(c.req.query("offset") || "0");
   const limit = Number(c.req.query("limit") || "20");
-  const { data, total } = await conversationService.getConversations(
+  const { data, total } = await conversationService.listConversations(
     offset,
     limit,
   );
@@ -31,7 +31,7 @@ export const getAll = async (c: Context) => {
   return c.json({ success: true, data, pagination: { offset, limit, total } });
 };
 
-export const update = async (c: Context) => {
+export const updateConversation = async (c: Context) => {
   const id = c.req.param("id");
   const body = await c.req.json<UpdateConversationDto>();
 
@@ -55,6 +55,6 @@ export const sendMessage = async (c: Context) => {
     throw new BadRequestError("content is required");
   }
 
-  const result = await conversationService.sendMessage(id, body.content);
+  const result = await conversationService.processMessage(id, body.content);
   return c.json({ success: true, data: result }, 201);
 };

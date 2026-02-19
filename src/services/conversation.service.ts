@@ -5,13 +5,13 @@ import * as validate from "../utils/validateObjectId";
 import * as aiService from "./ai.service";
 
 export const createConversation = (title: string) => {
-  return conversationRepo.create({ title });
+  return conversationRepo.insertConversation({ title });
 };
 
-export const getConversations = async (offset: number, limit: number) => {
+export const listConversations = async (offset: number, limit: number) => {
   const [data, total] = await Promise.all([
-    conversationRepo.findAll(offset, limit),
-    conversationRepo.count(),
+    conversationRepo.findConversations(offset, limit),
+    conversationRepo.countConversations(),
   ]);
   return { data, total };
 };
@@ -25,14 +25,14 @@ export const updateConversation = async (id: string, title: string) => {
   return conversationRepo.updateTitle(id, title);
 };
 
-export const sendMessage = async (conversationId: string, content: string) => {
+export const processMessage = async (conversationId: string, content: string) => {
   validate.validateObjectId(conversationId);
   const existing = await conversationRepo.findById(conversationId);
   if (!existing) {
     throw new NotFoundError("conversation not found");
   }
 
-  const userMessage = await messageRepo.create({
+  const userMessage = await messageRepo.insertMessage({
     conversationId,
     role: "user",
     content,
@@ -40,7 +40,7 @@ export const sendMessage = async (conversationId: string, content: string) => {
 
   const aiReply = aiService.generateReply(content);
 
-  const aiMessage = await messageRepo.create({
+  const aiMessage = await messageRepo.insertMessage({
     conversationId,
     role: "assistant",
     content: aiReply,

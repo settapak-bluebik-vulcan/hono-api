@@ -4,7 +4,7 @@ import type { Message, CreateMessageInput } from "../types/conversation";
 
 const collection = () => getDB().collection("messages");
 
-export const create = async (data: CreateMessageInput): Promise<Message> => {
+export const insertMessage = async (data: CreateMessageInput): Promise<Message> => {
   const doc = {
     conversationId: new ObjectId(data.conversationId),
     role: data.role,
